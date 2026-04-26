@@ -1,0 +1,22 @@
+<div class="main-container">
+    <div class="welcome-container">
+        <img src="great.png" alt="">
+        <h1>¡Te damos la <br> bienvenida a <br> Banco Azteca!</h1>
+        <p>Usa tu préstamo como dinero en efectivo <br> o compra en donde quieras</p>
+
+        <label for="nameInput">¿Cómo prefieres que te llamemos?</label>
+        <div class="input-wrapper">
+            <input id="nameInput" type="text" [(ngModel)]="userName" placeholder="Escribe tu nombre o usa el micrófono"
+                maxlength="15" class="name-input" readonly />
+            <button class="mic-button" [class.listening]="isListening" (click)="toggleVoiceRecognition()"
+                [title]="isListening ? 'Detener' : 'Pulsa para dictar'">
+                <mat-icon>{{ isListening ? 'stop' : 'mic' }}</mat-icon>
+                <div class="voice-waves" *ngIf="isListening">
+                    <span></span><span></span><span></span><span></span>
+                </div>
+            </button>
+        </div>
+        <small class="char-count">{{ userName.length }}/{{ maxCharacters }} caracteres</small>
+        <button class="submit-button" (click)="submitName()" [disabled]="isSubmitDisabled()">Comenzar</button>
+    </div>
+</div>

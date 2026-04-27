@@ -8,6 +8,10 @@ import { environment } from '../../enviroments/environment';
 
 // Trigger rebuild
 
+/**
+ * Componente que gestiona el formulario de bienvenida, permitiendo la entrada de nombre
+ * mediante teclado o reconocimiento de voz, y gestionando la encriptación del mismo.
+ */
 @Component({
   selector: 'app-welcome-form',
   imports: [CommonModule, FormsModule, MatIconModule, MatSnackBarModule],
@@ -15,10 +19,15 @@ import { environment } from '../../enviroments/environment';
   styleUrl: './welcome-form.scss',
 })
 export class WelcomeForm {
+  /** Nombre del usuario ingresado */
   userName: string = '';
+  /** Estado que indica si se está escuchando por el micrófono */
   isListening: boolean = false;
+  /** Objeto de la API de reconocimiento de voz de la web */
   recognition: any;
+  /** Límite máximo de caracteres permitidos para el nombre */
   maxCharacters: number = 15;
+  /** Texto encriptado recibido del servidor */
   encryptedText: string = '';
 
   constructor(
@@ -30,6 +39,9 @@ export class WelcomeForm {
     this.initializeSpeechRecognition();
   }
 
+  /**
+   * Configura e inicializa los eventos de la API de Web Speech para el reconocimiento de voz.
+   */
   initializeSpeechRecognition() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
@@ -80,6 +92,9 @@ export class WelcomeForm {
     }
   }
 
+  /**
+   * Inicia o detiene el reconocimiento de voz dependiendo del estado actual.
+   */
   toggleVoiceRecognition() {
     if (!this.recognition) return;
 
@@ -95,6 +110,9 @@ export class WelcomeForm {
     }
   }
 
+  /**
+   * Envía el nombre al servidor para ser encriptado.
+   */
   submitName() {
     if (this.userName.trim().length > 0) {
       console.log('Nombre ingresado:', this.userName);
@@ -111,6 +129,9 @@ export class WelcomeForm {
     }
   }
 
+  /**
+   * Copia el texto encriptado al portapapeles del sistema y muestra un mensaje de confirmación.
+   */
   copyToClipboard() {
     if (this.encryptedText) {
       navigator.clipboard.writeText(this.encryptedText).then(() => {
@@ -125,6 +146,10 @@ export class WelcomeForm {
     }
   }
 
+  /**
+   * Valida si el botón de envío debe estar deshabilitado.
+   * @returns true si el nombre está vacío, false de lo contrario.
+   */
   isSubmitDisabled(): boolean {
     return this.userName.trim().length === 0;
   }

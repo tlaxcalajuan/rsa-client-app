@@ -1,59 +1,56 @@
-# RsaClientApp
+# RSA Voice Recognition Client
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.0.5.
+Este proyecto es una aplicación frontend desarrollada con **Angular 20** que permite capturar el nombre del usuario mediante teclado o **reconocimiento de voz** (Web Speech API). El nombre capturado se envía a un servidor backend para ser encriptado utilizando el algoritmo **RSA**.
 
-## Development server
+## Características
 
-To start a local development server, run:
+- **Reconocimiento de voz**: Utiliza la API nativa del navegador para capturar texto de forma interactiva.
+- **Encriptación RSA**: Se integra con un servicio backend para asegurar la información.
+- **Copiado al portapapeles**: Permite copiar el resultado encriptado fácilmente.
+- **Diseño Responsivo**: Interfaz moderna y adaptable.
 
-```bash
-ng serve
-```
+## Requisitos Previos
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- [Node.js](https://nodejs.org/) (versión 18 o superior recomendada).
+- [Angular CLI](https://angular.io/cli) instalado globalmente (`npm install -g @angular/cli`).
 
-## Code scaffolding
+## Instalación
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. Navega al directorio del cliente:
+   ```bash
+   cd rsa-client-app
+   ```
+2. Instala las dependencias:
+   ```bash
+   npm install
+   ```
 
-```bash
-ng generate component component-name
-```
+## Ejecución
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+Para iniciar el servidor de desarrollo, ejecuta:
 
 ```bash
-ng test
+npm start
 ```
 
-## Running end-to-end tests
+La aplicación estará disponible en `http://localhost:4200/`.
 
-For end-to-end (e2e) testing, run:
+## Pruebas Unitarias
+
+El proyecto cuenta con pruebas unitarias exhaustivas para asegurar el correcto funcionamiento de los componentes y servicios.
+
+Para ejecutar las pruebas:
 
 ```bash
-ng e2e
+npm test
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+## Despliegue en Producción
 
-## Additional Resources
+La aplicación está desplegada en **Vercel**:
+[https://rsa-client-app.vercel.app/](https://rsa-client-app.vercel.app/)
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+## Configuración
+
+Las variables de entorno y la URL de la API se gestionan mediante archivos de entorno en:
+`src/app/enviroments/environment.ts` (para desarrollo) y configuraciones de **Vercel** (para producción).

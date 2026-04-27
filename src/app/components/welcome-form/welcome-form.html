@@ -18,5 +18,15 @@
         </div>
         <small class="char-count">{{ userName.length }}/{{ maxCharacters }} caracteres</small>
         <button class="submit-button" (click)="submitName()" [disabled]="isSubmitDisabled()">Comenzar</button>
+
+        <div class="result-container" *ngIf="encryptedText">
+            <label>Respuesta encriptada:</label>
+            <div class="textarea-wrapper">
+                <textarea [value]="encryptedText" readonly rows="4" class="encrypted-textarea"></textarea>
+                <button class="copy-button" (click)="copyToClipboard()" title="Copiar al portapapeles">
+                    <mat-icon>content_copy</mat-icon>
+                </button>
+            </div>
+        </div>
     </div>
 </div>

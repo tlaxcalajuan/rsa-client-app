@@ -2,10 +2,15 @@ import { Component, NgZone, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpClient } from '@angular/common/http';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { environment } from '../../enviroments/environment';
+
+// Trigger rebuild
 
 @Component({
   selector: 'app-welcome-form',
-  imports: [CommonModule, FormsModule, MatIconModule],
+  imports: [CommonModule, FormsModule, MatIconModule, MatSnackBarModule],
   templateUrl: './welcome-form.html',
   styleUrl: './welcome-form.scss',
 })
@@ -14,55 +19,46 @@ export class WelcomeForm {
   isListening: boolean = false;
   recognition: any;
   maxCharacters: number = 15;
-  private silenceTimer: any;
+  encryptedText: string = '';
 
-  constructor(private ngZone: NgZone, private cdr: ChangeDetectorRef) {
+  constructor(
+    private ngZone: NgZone, 
+    private cdr: ChangeDetectorRef, 
+    private http: HttpClient,
+    private snackBar: MatSnackBar
+  ) {
     this.initializeSpeechRecognition();
-  }
-
-  private resetSilenceTimer() {
-    if (this.silenceTimer) clearTimeout(this.silenceTimer);
-    
-    this.silenceTimer = setTimeout(() => {
-      this.ngZone.run(() => {
-        if (this.isListening) {
-          this.recognition.stop();
-        }
-      });
-    }, 2000);
-  }
-
-  private clearSilenceTimer() {
-    if (this.silenceTimer) {
-      clearTimeout(this.silenceTimer);
-      this.silenceTimer = null;
-    }
   }
 
   initializeSpeechRecognition() {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
-      this.recognition.continuous = true;
+      // Al usar continuous = false, el reconocimiento se detiene automáticamente 
+      // cuando el usuario hace una pausa, lo que es ideal para inputs cortos.
+      this.recognition.continuous = false;
       this.recognition.interimResults = true;
       this.recognition.lang = 'es-ES';
 
       this.recognition.onstart = () => {
         this.ngZone.run(() => {
           this.isListening = true;
-          this.resetSilenceTimer();
           this.cdr.detectChanges();
         });
       };
 
       this.recognition.onresult = (event: any) => {
         this.ngZone.run(() => {
-          this.resetSilenceTimer();
           let fullTranscript = '';
           for (let i = 0; i < event.results.length; i++) {
-            fullTranscript += event.results[i][0].transcript;
+            fullTranscript += event.results[i][0].transcript + ' ';
           }
-          const cleanedText = fullTranscript.replace(/[^a-zA-ZáéíóúñÁÉÍÓÚÑ\s]/g, '');
+          
+          // Limpiar el texto: quitar espacios extras
+          fullTranscript = fullTranscript.trim();
+
+          // Permitir solo caracteres alfanuméricos (SIN espacios)
+          const cleanedText = fullTranscript.replace(/[^a-zA-Z0-9áéíóúñÁÉÍÓÚÑ]/g, '');
           this.userName = cleanedText.substring(0, this.maxCharacters).trim();
           this.cdr.detectChanges();
         });
@@ -71,7 +67,6 @@ export class WelcomeForm {
       this.recognition.onerror = (event: any) => {
         this.ngZone.run(() => {
           this.isListening = false;
-          this.clearSilenceTimer();
           this.cdr.detectChanges();
         });
       };
@@ -79,7 +74,6 @@ export class WelcomeForm {
       this.recognition.onend = () => {
         this.ngZone.run(() => {
           this.isListening = false;
-          this.clearSilenceTimer();
           this.cdr.detectChanges();
         });
       };
@@ -104,6 +98,30 @@ export class WelcomeForm {
   submitName() {
     if (this.userName.trim().length > 0) {
       console.log('Nombre ingresado:', this.userName);
+      this.http.post<{ original: string, encrypted: string }>(`${environment.apiUrl}/encrypt`, { text: this.userName })
+        .subscribe({
+          next: (response) => {
+            this.encryptedText = response.encrypted;
+            this.cdr.detectChanges();
+          },
+          error: (err) => {
+            console.error('Error encrypting name:', err);
+          }
+        });
+    }
+  }
+
+  copyToClipboard() {
+    if (this.encryptedText) {
+      navigator.clipboard.writeText(this.encryptedText).then(() => {
+        this.snackBar.open('¡Copiado al portapapeles!', 'Cerrar', {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'bottom',
+        });
+      }).catch(err => {
+        console.error('Error al copiar: ', err);
+      });
     }
   }
 
